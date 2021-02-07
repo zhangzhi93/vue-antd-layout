@@ -1,0 +1,17 @@
+node_modules
+packages
+dist
+pages
+src
+
+# 忽略指定文件
+App.vue
+favicon.ico
+index.html
+main.js
+router.js
+package-lock.json
+.gitignore
+.browserslistrc
+.editorconfig
+*.map
