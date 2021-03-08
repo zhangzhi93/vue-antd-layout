@@ -12,7 +12,8 @@
     <div class="slider-menu">
       <a-menu mode="inline" :theme="theme" :inline-collapsed="collapsed"
         :inlineIndent="inlineIndent" :defaultSelectedKeys="defaultSelectedKeys"
-        :defaultOpenKeys="defaultOpenKeys">
+        :defaultOpenKeys="defaultOpenKeys" :selectedKeys="selectedKeys" :openKeys.sync="openKeys"
+        @click="onMenuClick">
         <template v-for="menu in data">
           <sub-menu v-if="menu.children && menu.children.length!==0" :key="menu.name"
             :menu-info="menu" />
@@ -30,7 +31,7 @@ import MenuItem from './MenuItem.vue';
 
 export default {
   name: 'Slider',
-  props: ['data', 'theme', 'width', 'logo', 'title', 'collapsed', 'collapsedWidth', 'inlineIndent', 'defaultSelectedKeys', 'defaultOpenKeys'],
+  props: ['data', 'theme', 'width', 'logo', 'title', 'collapsed', 'collapsedWidth', 'inlineIndent', 'defaultSelectedKeys', 'defaultOpenKeys', 'selectedKeys', 'openKeys'],
   data() {
     return {};
   },
@@ -40,8 +41,12 @@ export default {
   },
   methods: {
     onMenuHeaderClick() {
-      this.$emit('onMenuHeaderClick');
+      this.$emit('menuHeaderClick');
     },
+    onMenuClick(data) {
+      debugger;
+      this.$emit('menuClick', data);
+    }
   },
 };
 </script>

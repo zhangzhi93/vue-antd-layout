@@ -1,6 +1,6 @@
 {
   "name": "vue-antd-layout",
-  "version": "0.0.1",
+  "version": "0.0.7",
   "description": "基于antd快速搭建中台前端的layout",
   "main": "lib/index.js",
   "scripts": {

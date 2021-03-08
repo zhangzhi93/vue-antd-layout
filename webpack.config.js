@@ -48,12 +48,6 @@ module.exports = {
     new VueLoaderPlugin(),
     new ProgressBarPlugin(),
   ],
-  resolve: {
-    extensions: ['.js', '.vue', '.json'],
-    alias: {
-      'vue$': 'vue/dist/vue.esm.js'
-    },
-  },
   devServer: {
     contentBase: './lib',
     hot: true,
@@ -73,6 +67,12 @@ if (isProduction) {
     umdNamedDefine: true
   });
   module.exports.plugins.push(new CleanWebpackPlugin());
+  module.exports.resolve = {
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js'
+    },
+    extensions: ['.js', '.vue', '.json']
+  };
   module.exports.externals = {
     'vue': 'Vue',
     'antd': 'antd',

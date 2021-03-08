@@ -79,7 +79,7 @@ export default {
   .trigger {
     display: inline-block;
     box-sizing: border-box;
-    height: 64px;
+    height: 100%;
     padding: 0 15px;
     font-size: 20px;
     cursor: pointer;

@@ -10,12 +10,14 @@
             @click.stop="removeTab(item)" />
         </li>
       </ul>
+      <slot name="tabBarExtraContent" slot="tabBarExtraContent"></slot>
     </div>
     <a-tabs v-model="activeKey" type="editable-card" size="small" @tab-click="onClick"
-      @edit="onEdit" @contextmenu.prevent.native="onTabsContextmenu" hideAdd v-else
-      class="scroll-tabs">
+      @edit="onEdit" @contextmenu.prevent.native="onTabsContextmenu" hideAdd :animated="animated"
+      v-else class="scroll-tabs">
       <a-tab-pane v-for="item in tabsData" :key="item.name" :tab="item.title" :name="item.name"
         :closable="!item.permanent" />
+      <slot name="tabBarExtraContent" slot="tabBarExtraContent"></slot>
     </a-tabs>
   </div>
 </template>
@@ -35,6 +37,10 @@ export default {
     type: {
       type: String,
       default: 'scroll'
+    },
+    animated: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -44,17 +50,23 @@ export default {
   },
   methods: {
     onClick(data) {
-      this.$emit('tab-click', data);
+      this.$emit('tab-click', { ...data });
     },
     removeTab(data) {
-      this.$emit('tab-remove', data);
+      this.$emit('tab-remove', { ...data });
+    },
+    onEdit(targetKey, action) {
+      if (action === 'remove') {
+        const data = this.tabsData.find(item => item.name === targetKey) || {};
+        this.$emit('tab-remove', { ...data });
+      }
     },
     onTabsContextmenu(e) {
       const data = this.tabsData.find(item => item.name === e.target.id.split('-')[1]);
-      this.$emit('contextmenu', e, data);
+      this.$emit('contextmenu', e, { ...data });
     },
     onContextmenu(e, data) {
-      this.$emit('contextmenu', e, data);
+      this.$emit('contextmenu', e, { ...data });
     }
   }
 }
@@ -79,10 +91,31 @@ export default {
     .ant-tabs-tab {
       height: 30px;
       line-height: 28px;
+      border: none;
+      border-right: 1px solid #e8e8e8;
+      font-size: 13px;
+      margin-right: 0;
+      border-radius: 0;
+      .anticon-close {
+        opacity: 0;
+        font-size: 10px;
+      }
     }
     .ant-tabs-tab-active {
       border-bottom: none;
       font-weight: normal;
+      .anticon-close {
+        opacity: 1;
+      }
+      // &:after {
+      //   content: "";
+      //   display: block;
+      //   width: 100%;
+      //   border-bottom: 2px solid @primary-color;
+      // }
+    }
+    .ant-tabs-ink-bar {
+      visibility: visible;
     }
   }
 }
@@ -120,10 +153,10 @@ export default {
       span {
         display: block;
         font-size: 13px;
-        padding-left: 5px;
+        padding-left: 10px;
         overflow: hidden;
         white-space: nowrap;
-        text-align: center;
+        text-align: left;
         transition: color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
         &::after {
           content: "";

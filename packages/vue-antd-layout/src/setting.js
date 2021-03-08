@@ -4,6 +4,7 @@ export default {
   title: 'Antd Layout',
   siderWidth: '208',
   collapsedWidth: 64,
+  inlineIndent: 24,
   headerHeight: '48px',
   collapsible: true,
   collapse: false,

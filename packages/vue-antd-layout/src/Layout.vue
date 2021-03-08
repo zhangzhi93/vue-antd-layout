@@ -1,9 +1,12 @@
 <template>
   <a-layout>
     <Slider :data="menuData" :theme="theme" :logo="logo" :title="title" :breakpoint="breakpoint"
-      :collapsed="collapsed" :width="siderWidth" :collapsible="collapsible"
+      :collapsed="collapsed" :width="siderWidth" :inlineIndent="inlineIndent"
+      :defaultSelectedKeys="defaultSelectedKeys" :defaultOpenKeys="defaultOpenKeys"
+      :selectedKeys="selectedKeys" :openKeys="openKeys" :collapsible="collapsible"
       :defaultCollapsed="defaultCollapsed" :trigger="trigger" :reverseArrow="reverseArrow"
-      :collapsedWidth="collapsedWidth" @breakpoint="onBreakpoint">
+      :collapsedWidth="collapsedWidth" @breakpoint="onBreakpoint" @menuClick="onMenuClick"
+      @menuHeaderClick="onMenuHeaderClick">
       <slot name="menuHeader" slot="menuHeader"></slot>
       <slot name="asideExtra" slot="asideExtra"></slot>
     </Slider>
@@ -45,9 +48,6 @@ export default {
       type: String,
       default: setting.theme,
     },
-    // style: {
-    //   type: [Object, String],
-    // },
     breakpoint: {
       type: String,
     },
@@ -58,6 +58,10 @@ export default {
     title: {
       type: String,
       default: setting.title,
+    },
+    inlineIndent: {
+      type: Number,
+      default: setting.inlineIndent,
     },
     headerHeight: {
       type: String,
@@ -84,6 +88,18 @@ export default {
     },
     reverseArrow: {
       type: Boolean
+    },
+    defaultSelectedKeys: {
+      type: Array
+    },
+    defaultOpenKeys: {
+      type: Array
+    },
+    selectedKeys: {
+      type: Array
+    },
+    openKeys: {
+      type: Array
     },
     showFooter: {
       type: Boolean,
@@ -112,7 +128,10 @@ export default {
   },
   methods: {
     onMenuHeaderClick() {
-      this.$emit('onMenuHeaderClick');
+      this.$emit('menuHeaderClick');
+    },
+    onMenuClick(data) {
+      this.$emit('menuClick', data);
     },
     toggle(bol) {
       this.collapsed = bol;

@@ -1,9 +1,11 @@
 <template>
   <div id="app">
     <vue-antd-layout :menu-data="data" :default-selected-keys="['one']"
-      :default-open-keys="['dashboard','status']" @onMenuHeaderClick="goHome">
-      <layout-tabs slot="navTabs" :tabs-data="tabs" :active-name="active" @tab-click="onTabClick"
-        @contextmenu="onContextmenu" type="flex"></layout-tabs>
+      :default-open-keys="['dashboard','status']" @onMenuHeaderClick="goHome"
+      @menu-click="onMenuClick">
+      <layout-tabs slot="navTabs" animated :tabs-data="tabs" :active-name="active"
+        @tab-click="onTabClick" @tab-remove="onTabRemove" @contextmenu="onContextmenu"
+        type="scroll"></layout-tabs>
       <div slot="rightContent" class="avatar">
         <a-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
       </div>
@@ -254,8 +256,14 @@ export default {
     onTabClick(data) {
       this.active = data.name;
     },
+    onTabRemove(data) {
+      console.log(data);
+    },
     onContextmenu(e, data) {
       console.log(e, data);
+    },
+    onMenuClick(data) {
+      console.log(data);
     }
   },
 };
