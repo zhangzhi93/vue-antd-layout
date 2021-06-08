@@ -1,12 +1,28 @@
 <template>
   <div id="app">
-    <vue-antd-layout :menu-data="data" :default-selected-keys="['one']"
-      :default-open-keys="['dashboard','status']" @onMenuHeaderClick="goHome"
-      @menu-click="onMenuClick">
-      <layout-tabs slot="navTabs" animated :tabs-data="tabs" :active-name="active"
-        @tab-click="onTabClick" @tab-remove="onTabRemove" @contextmenu="onContextmenu"
-        type="scroll"></layout-tabs>
-      <div slot="rightContent" class="avatar">
+    <vue-antd-layout
+      :collapsed.sync="expand"
+      :menu-data="data"
+      :selected-keys.sync="selectedKeys"
+      :open-keys="['dashboard','status']"
+      @onMenuHeaderClick="goHome"
+      @menu-click="onMenuClick"
+    >
+      <layout-tabs
+        slot="navTabs"
+        animated
+        :tabs-data="tabs"
+        v-model="active"
+        @tab-click="onTabClick"
+        @tab-remove="onTabRemove"
+        @contextmenu="onContextmenu"
+        type="scroll"
+      ></layout-tabs>
+      <p slot="asidePrefix">dddd</p>
+      <div
+        slot="rightContent"
+        class="avatar"
+      >
         <a-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
       </div>
       <div class="content">
@@ -74,6 +90,7 @@ export default {
   data() {
     return {
       expand: false,
+      selectedKeys: ['one'],
       active: '',
       tabs: [{
         title: 'Tab 1',
@@ -184,20 +201,22 @@ export default {
             name: 'two',
             title: '更新日志',
             icon: 'copy',
+            hide: true
           }],
         }, {
           name: 'update',
           title: '更新日志',
           icon: 'el-icon-menu',
+          hide: true
         }],
       }, {
         name: 'wechat',
         title: '微信配置',
         icon: 'wechat',
         children: [{
-          name: 'menu',
-          title: '菜单管理',
-          icon: 'medium',
+          // name: 'menu',
+          // title: '菜单管理',
+          // icon: 'medium',
         }, {
           name: 'reply',
           title: '关键词回复',
@@ -247,6 +266,12 @@ export default {
   watch: {
     expand(val) {
       console.log(val)
+    },
+    active(val) {
+      console.log('v-model', val)
+    },
+    selectedKeys(val) {
+      console.log(val)
     }
   },
   methods: {
@@ -254,7 +279,8 @@ export default {
       window.open('https://www.baidu.com');
     },
     onTabClick(data) {
-      this.active = data.name;
+      console.log('click', data)
+      // this.active = data.name;
     },
     onTabRemove(data) {
       console.log(data);
@@ -266,6 +292,9 @@ export default {
       console.log(data);
     }
   },
+  mounted() {
+    this.active = 'd'
+  }
 };
 </script>
 

@@ -15,3 +15,4 @@ package-lock.json
 .browserslistrc
 .editorconfig
 *.map
+.vscode

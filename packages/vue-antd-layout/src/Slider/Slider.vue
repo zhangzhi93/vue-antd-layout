@@ -1,23 +1,49 @@
 <template>
-  <a-layout-sider :collapsed="collapsed" :theme="theme" :width="width"
-    :collapsedWidth="collapsedWidth" class="layout-slider">
+  <a-layout-sider
+    v-model="expand"
+    :collapsible="collapsible"
+    :theme="theme"
+    :width="width"
+    :trigger="trigger"
+    :collapsedWidth="collapsedWidth"
+    class="layout-slider"
+  >
     <slot name="menuHeader">
-      <div class="logo" @click="onMenuHeaderClick">
-        <img :src="logo" :alt="title">
+      <div
+        class="logo"
+        @click="onMenuHeaderClick"
+      >
+        <img
+          :src="logo"
+          :alt="title"
+        >
         <transition name="collapse">
           <h1 v-if="!collapsed">{{title}}</h1>
         </transition>
       </div>
     </slot>
     <div class="slider-menu">
-      <a-menu mode="inline" :theme="theme" :inline-collapsed="collapsed"
-        :inlineIndent="inlineIndent" :defaultSelectedKeys="defaultSelectedKeys"
-        :defaultOpenKeys="defaultOpenKeys" :selectedKeys="selectedKeys" :openKeys.sync="openKeys"
-        @click="onMenuClick">
+      <slot name="asidePrefix"></slot>
+      <a-menu
+        mode="inline"
+        v-model="sliderSelectedKeys"
+        :theme="theme"
+        :inline-collapsed="collapsed"
+        :inlineIndent="inlineIndent"
+        :openKeys.sync="sliderOpenKeys"
+        @click="onMenuClick"
+      >
         <template v-for="menu in data">
-          <sub-menu v-if="menu.children && menu.children.length!==0" :key="menu.name"
-            :menu-info="menu" />
-          <menu-item v-else :key="menu.name" :menu-info="menu" />
+          <sub-menu
+            v-if="menu.children && menu.children.length!==0"
+            :key="menu.name"
+            :menu-info="menu"
+          />
+          <menu-item
+            v-else
+            :key="menu.name"
+            :menu-info="menu"
+          />
         </template>
       </a-menu>
     </div>
@@ -31,28 +57,59 @@ import MenuItem from './MenuItem.vue';
 
 export default {
   name: 'Slider',
-  props: ['data', 'theme', 'width', 'logo', 'title', 'collapsed', 'collapsedWidth', 'inlineIndent', 'defaultSelectedKeys', 'defaultOpenKeys', 'selectedKeys', 'openKeys'],
+  props: ['data', 'theme', 'width', 'logo', 'title', 'trigger', 'collapsible', 'collapsed', 'collapsedWidth', 'inlineIndent', 'selectedKeys', 'openKeys'],
   data() {
-    return {};
+    return {
+      expand: false,
+      sliderOpenKeys: [],
+      sliderSelectedKeys: [],
+    };
   },
   components: {
     SubMenu,
     MenuItem,
+  },
+  watch: {
+    collapsed: {
+      handler(val) {
+        this.expand = val;
+      },
+      immediate: true
+    },
+    expand(val) {
+      this.$emit('update:collapsed', val);
+    },
+    openKeys: {
+      handler(vals) {
+        this.sliderOpenKeys = vals;
+      },
+      immediate: true
+    },
+    sliderOpenKeys(vals) {
+      this.$emit('update:openKeys', vals);
+    },
+    selectedKeys: {
+      handler(vals) {
+        this.sliderSelectedKeys = vals;
+      },
+      immediate: true
+    },
+    sliderSelectedKeys(vals) {
+      this.$emit('update:selectedKeys', vals);
+    }
   },
   methods: {
     onMenuHeaderClick() {
       this.$emit('menuHeaderClick');
     },
     onMenuClick(data) {
-      debugger;
       this.$emit('menuClick', data);
     }
   },
 };
 </script>
 
-<style lang="less" scoped>
-@import url("../../../styles.less");
+<style lang="less">
 .layout-slider {
   z-index: 100;
   text-align: left;
@@ -98,18 +155,16 @@ export default {
   .ant-menu-vertical {
     border-right: 1px solid #fff;
   }
-  /deep/.ant-menu-inline-collapsed
-    > .ant-menu-submenu
-    > .ant-menu-submenu-title,
+  .ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title,
   .ant-menu-inline-collapsed > .ant-menu-item {
     padding: 0 16px !important;
     text-align: center;
     font-size: 18px;
   }
-  /deep/.ant-menu-inline-collapsed {
+  .ant-menu-inline-collapsed {
     width: 100%;
   }
-  /deep/.ant-menu-inline-collapsed
+  .ant-menu-inline-collapsed
     > .ant-menu-submenu
     > .ant-menu-submenu-title
     .anticon,

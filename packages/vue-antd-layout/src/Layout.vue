@@ -1,30 +1,74 @@
 <template>
   <a-layout>
-    <Slider :data="menuData" :theme="theme" :logo="logo" :title="title" :breakpoint="breakpoint"
-      :collapsed="collapsed" :width="siderWidth" :inlineIndent="inlineIndent"
-      :defaultSelectedKeys="defaultSelectedKeys" :defaultOpenKeys="defaultOpenKeys"
-      :selectedKeys="selectedKeys" :openKeys="openKeys" :collapsible="collapsible"
-      :defaultCollapsed="defaultCollapsed" :trigger="trigger" :reverseArrow="reverseArrow"
-      :collapsedWidth="collapsedWidth" @breakpoint="onBreakpoint" @menuClick="onMenuClick"
-      @menuHeaderClick="onMenuHeaderClick">
-      <slot name="menuHeader" slot="menuHeader"></slot>
-      <slot name="asideExtra" slot="asideExtra"></slot>
+    <Slider
+      :collapsed.sync="expand"
+      :data="menuData"
+      :theme="theme"
+      :logo="logo"
+      :title="title"
+      :width="siderWidth"
+      :collapsedWidth="collapsedWidth"
+      :breakpoint="breakpoint"
+      :inlineIndent="inlineIndent"
+      :selectedKeys.sync="sliderSelectedKeys"
+      :openKeys.sync="sliderOpenKeys"
+      :collapsible="collapsible"
+      :defaultCollapsed="defaultCollapsed"
+      :trigger="trigger"
+      :reverseArrow="reverseArrow"
+      @breakpoint="onBreakpoint"
+      @menuClick="onMenuClick"
+      @menuHeaderClick="onMenuHeaderClick"
+    >
+      <slot
+        name="asidePrefix"
+        slot="asidePrefix"
+      ></slot>
+      <slot
+        name="menuHeader"
+        slot="menuHeader"
+      ></slot>
+      <slot
+        name="asideExtra"
+        slot="asideExtra"
+      ></slot>
     </Slider>
     <a-layout class="container">
-      <Header :collapsible="collapsible" :collapsed="collapsed" :height="headerHeight"
-        :theme="theme" @trigger="toggle">
-        <slot name="header" slot="header"></slot>
-        <slot name="collapsedButton" slot="collapsedButton"></slot>
-        <slot name="rightContent" slot="rightContent"></slot>
-        <slot name="navTabs" slot="navTabs"></slot>
+      <Header
+        :collapsible="collapsible"
+        :collapsed.sync="expand"
+        :height="headerHeight"
+        :theme="theme"
+      >
+        <slot
+          name="header"
+          slot="header"
+        ></slot>
+        <slot
+          name="collapsedButton"
+          slot="collapsedButton"
+        ></slot>
+        <slot
+          name="rightContent"
+          slot="rightContent"
+        ></slot>
+        <slot
+          name="navTabs"
+          slot="navTabs"
+        ></slot>
       </Header>
       <a-layout-content :class="['main',$slots.navTabs?'has-tabs':'']">
         <slot></slot>
-        <div class="footer" v-if="showFooter">
+        <div
+          class="footer"
+          v-if="showFooter"
+        >
           <slot name="footer">
             <p>Vue-Antd-Layout</p>
-            <a href="https://github.com/zhangzhi93"
-              target="_blank">https://github.com/zhangzhi93</a>
+            <a
+              href="https://github.com/zhangzhi93"
+              target="_blank"
+            >https://github.com/zhangzhi93</a>
           </slot>
         </div>
       </a-layout-content>
@@ -40,6 +84,10 @@ import setting from './setting';
 export default {
   name: 'vue-antd-layout',
   props: {
+    collapsed: {
+      type: Boolean,
+      default: false,
+    },
     menuData: {
       type: Array,
       default: () => [],
@@ -84,16 +132,10 @@ export default {
       default: setting.siderWidth,
     },
     trigger: {
-      type: String
+      type: String,
     },
     reverseArrow: {
       type: Boolean
-    },
-    defaultSelectedKeys: {
-      type: Array
-    },
-    defaultOpenKeys: {
-      type: Array
     },
     selectedKeys: {
       type: Array
@@ -108,7 +150,9 @@ export default {
   },
   data() {
     return {
-      collapsed: false,
+      expand: false,
+      sliderOpenKeys: [],
+      sliderSelectedKeys: []
     };
   },
   components: {
@@ -116,15 +160,33 @@ export default {
     Slider,
   },
   watch: {
-    collapse: {
+    collapsed: {
       handler(val) {
         this.expand = val;
       },
       immediate: true
     },
     expand(val) {
-      this.$emit('update:collapse', val);
+      this.$emit('update:collapsed', val);
     },
+    openKeys: {
+      handler(vals) {
+        this.sliderOpenKeys = vals;
+      },
+      immediate: true
+    },
+    sliderOpenKeys(vals) {
+      this.$emit('update:openKeys', vals);
+    },
+    selectedKeys: {
+      handler(vals) {
+        this.sliderSelectedKeys = vals;
+      },
+      immediate: true
+    },
+    sliderSelectedKeys(vals) {
+      this.$emit('update:selectedKeys', vals);
+    }
   },
   methods: {
     onMenuHeaderClick() {
@@ -134,7 +196,7 @@ export default {
       this.$emit('menuClick', data);
     },
     toggle(bol) {
-      this.collapsed = bol;
+      this.expand = bol;
     },
     onBreakpoint(broken) {
       this.$emit('breakpoint', broken);

@@ -1,9 +1,13 @@
 <template>
   <div class="header">
     <a-layout-header :style="styleObject">
-      <div class="trigger" @click="toggle" v-if="collapsible">
+      <div
+        class="trigger"
+        @click="toggle"
+        v-if="collapsible"
+      >
         <slot name="collapsedButton">
-          <a-icon :type="collapsed ? 'menu-unfold' : 'menu-fold'" />
+          <a-icon :type="trigger ? 'menu-unfold' : 'menu-fold'" />
         </slot>
       </div>
       <div class="right-content">
@@ -58,11 +62,13 @@ export default {
       },
       immediate: true
     },
+    trigger(val) {
+      this.$emit('update:collapsed', val);
+    },
   },
   methods: {
     toggle() {
       this.trigger = !this.trigger;
-      this.$emit('trigger', this.trigger);
     },
   },
 };

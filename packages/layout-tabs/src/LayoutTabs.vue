@@ -1,23 +1,54 @@
 <template>
   <div class="layout-tabs">
-    <div class="flex-tabs" v-if="type==='flex'">
+    <div
+      class="flex-tabs"
+      v-if="type==='flex'"
+    >
       <ul>
-        <li v-for="item in tabsData" :key="item.name"
-          :class="{'active':activeName == item.name,'closable':!item.closable}"
-          @click="onClick(item)" @contextmenu.prevent="(e)=>onContextmenu(e,item)">
+        <li
+          v-for="item in tabsData"
+          :key="item.name"
+          :class="{'active':activeKey == item.name,'closable':!item.closable}"
+          @click="onClick(item)"
+          @contextmenu.prevent="(e)=>onContextmenu(e,item)"
+        >
           <span :title="item.title">{{item.title}}</span>
-          <a-icon type="close" class="close-btn" v-if="!item.permanent"
-            @click.stop="removeTab(item)" />
+          <a-icon
+            type="close"
+            class="close-btn"
+            v-if="!item.permanent"
+            @click.stop="removeTab(item)"
+          />
         </li>
       </ul>
-      <slot name="tabBarExtraContent" slot="tabBarExtraContent"></slot>
+      <slot
+        name="tabBarExtraContent"
+        slot="tabBarExtraContent"
+      ></slot>
     </div>
-    <a-tabs v-model="activeKey" type="editable-card" size="small" @tab-click="onClick"
-      @edit="onEdit" @contextmenu.prevent.native="onTabsContextmenu" hideAdd :animated="animated"
-      v-else class="scroll-tabs">
-      <a-tab-pane v-for="item in tabsData" :key="item.name" :tab="item.title" :name="item.name"
-        :closable="!item.permanent" />
-      <slot name="tabBarExtraContent" slot="tabBarExtraContent"></slot>
+    <a-tabs
+      v-else
+      v-model="activeKey"
+      type="editable-card"
+      hideAdd
+      size="small"
+      @tabClick="onTabClick"
+      @edit="onTabEdit"
+      @contextmenu.prevent.native="onTabContextmenu"
+      :animated="animated"
+      class="scroll-tabs"
+    >
+      <a-tab-pane
+        v-for="item in tabsData"
+        :key="item.name"
+        :tab="item.title"
+        :name="item.name"
+        :closable="!item.permanent"
+      />
+      <slot
+        name="tabBarExtraContent"
+        slot="tabBarExtraContent"
+      ></slot>
     </a-tabs>
   </div>
 </template>
@@ -25,6 +56,10 @@
 <script>
 export default {
   name: 'LayoutTabs',
+  model: {
+    prop: 'activeName',
+    event: 'update'
+  },
   props: {
     tabsData: {
       type: Array,
@@ -48,20 +83,35 @@ export default {
       activeKey: ''
     }
   },
+  watch: {
+    activeName: {
+      handler(val) {
+        this.activeKey = val;
+      },
+      immediate: true
+    },
+    activeKey(val) {
+      this.$emit('update', val);
+    },
+  },
   methods: {
     onClick(data) {
+      this.$emit('tab-click', { ...data });
+    },
+    onTabClick(targetKey) {
+      const data = this.tabsData.find(item => item.name === targetKey) || {};
       this.$emit('tab-click', { ...data });
     },
     removeTab(data) {
       this.$emit('tab-remove', { ...data });
     },
-    onEdit(targetKey, action) {
+    onTabEdit(targetKey, action) {
       if (action === 'remove') {
         const data = this.tabsData.find(item => item.name === targetKey) || {};
         this.$emit('tab-remove', { ...data });
       }
     },
-    onTabsContextmenu(e) {
+    onTabContextmenu(e) {
       const data = this.tabsData.find(item => item.name === e.target.id.split('-')[1]);
       this.$emit('contextmenu', e, { ...data });
     },
@@ -121,7 +171,7 @@ export default {
 }
 .flex-tabs {
   height: 30px;
-  border-bottom: 1px solid @border-color;
+  border-bottom: 1px solid @border-color-base;
   ul {
     display: flex;
     margin: 0;
@@ -130,7 +180,7 @@ export default {
       width: 100px;
       list-style: none;
       flex: 0 1 100px;
-      border-bottom: 1px solid @border-color;
+      border-bottom: 1px solid @border-color-base;
       // border-left: 1px solid @border-color;
       transition: color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
       height: 30px;
@@ -145,7 +195,7 @@ export default {
         width: 1px;
         left: 0;
         top: 6px;
-        background-color: @border-color;
+        background-color: @border-color-base;
       }
       &:first-child::before {
         display: none;
