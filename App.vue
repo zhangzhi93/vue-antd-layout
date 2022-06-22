@@ -94,21 +94,21 @@ export default {
       active: '',
       tabs: [{
         title: 'Tab 1',
-        name: 'a',
-        closable: 'false'
+        key: 'a',
+        permanent: true
       }, {
         title: 'Tab 2',
-        name: 'b',
+        key: 'b',
         url: 'www.baidu.com'
       }, {
         title: 'Tab 3',
-        name: 'c',
+        key: 'c',
       }, {
         title: 'Tab 4',
-        name: 'd',
+        key: 'd',
       }, {
         title: 'Tab 5',
-        name: 'e',
+        key: 'e',
         // }, {
         //   title: 'Tab 6',
         //   name: '6',

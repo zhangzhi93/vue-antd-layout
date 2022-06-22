@@ -2,17 +2,17 @@
   <div class="layout-tabs">
     <div
       class="flex-tabs"
-      v-if="type==='flex'"
+      v-if="type === 'flex'"
     >
       <ul>
         <li
           v-for="item in tabsData"
-          :key="item.name"
-          :class="{'active':activeKey == item.name,'closable':!item.closable}"
+          :key="item.key"
+          :class="{ 'active': activeKey == item.key, 'closable': !item.closable }"
           @click="onClick(item)"
-          @contextmenu.prevent="(e)=>onContextmenu(e,item)"
+          @contextmenu.prevent="(e) => onContextmenu(e, item)"
         >
-          <span :title="item.title">{{item.title}}</span>
+          <span :title="item.title">{{ item.title }}</span>
           <a-icon
             type="close"
             class="close-btn"
@@ -40,9 +40,8 @@
     >
       <a-tab-pane
         v-for="item in tabsData"
-        :key="item.name"
+        :key="item.key"
         :tab="item.title"
-        :name="item.name"
         :closable="!item.permanent"
       />
       <slot
@@ -54,6 +53,17 @@
 </template>
 
 <script>
+// 查询当前节点的所有同级前面的节点
+function prevAll(elem) {
+  const previousSiblings = [];
+  while ((elem = elem.previousSibling) && elem.nodeType !== 9) {
+    if (elem.nodeType === 1) {
+      previousSiblings.push(elem);
+    }
+  }
+  return previousSiblings;
+}
+
 export default {
   name: 'LayoutTabs',
   model: {
@@ -71,12 +81,15 @@ export default {
     },
     type: {
       type: String,
-      default: 'scroll'
+      default: 'scroll',
+      validator: (value) => {
+        return ['scroll', 'flex'].indexOf(value) !== -1
+      }
     },
     animated: {
       type: Boolean,
       default: false
-    }
+    },
   },
   data() {
     return {
@@ -99,7 +112,7 @@ export default {
       this.$emit('tab-click', { ...data });
     },
     onTabClick(targetKey) {
-      const data = this.tabsData.find(item => item.name === targetKey) || {};
+      const data = this.tabsData.find(item => item.key === targetKey) || {};
       this.$emit('tab-click', { ...data });
     },
     removeTab(data) {
@@ -107,23 +120,31 @@ export default {
     },
     onTabEdit(targetKey, action) {
       if (action === 'remove') {
-        const data = this.tabsData.find(item => item.name === targetKey) || {};
+        const data = this.tabsData.find(item => item.key === targetKey) || {};
         this.$emit('tab-remove', { ...data });
       }
     },
     onTabContextmenu(e) {
-      const data = this.tabsData.find(item => item.name === e.target.id.split('-')[1]);
+      let tabElem = null;
+      if (e.target.classList.contains('ant-tabs-tab')) {
+        tabElem = e.target;
+      } else {
+        tabElem = e.target.parentNode;
+      }
+      const index = prevAll(tabElem).length;
+      const data = this.tabsData[index];
       this.$emit('contextmenu', e, { ...data });
     },
     onContextmenu(e, data) {
       this.$emit('contextmenu', e, { ...data });
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="less" scoped>
 @import "../../styles.less";
+
 .layout-tabs {
   width: 100%;
   z-index: 2;
@@ -131,13 +152,16 @@ export default {
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
 }
+
 .scroll-tabs {
   /deep/.ant-tabs-bar.ant-tabs-card-bar {
     margin-bottom: 0;
     border-bottom: 0;
+
     .ant-tabs-nav-container {
       height: 30px;
     }
+
     .ant-tabs-tab {
       height: 30px;
       line-height: 28px;
@@ -146,17 +170,21 @@ export default {
       font-size: 13px;
       margin-right: 0;
       border-radius: 0;
+
       .anticon-close {
         opacity: 0;
         font-size: 10px;
       }
     }
+
     .ant-tabs-tab-active {
       border-bottom: none;
       font-weight: normal;
+
       .anticon-close {
         opacity: 1;
       }
+
       // &:after {
       //   content: "";
       //   display: block;
@@ -164,17 +192,21 @@ export default {
       //   border-bottom: 2px solid @primary-color;
       // }
     }
+
     .ant-tabs-ink-bar {
       visibility: visible;
     }
   }
 }
+
 .flex-tabs {
   height: 30px;
   border-bottom: 1px solid @border-color-base;
+
   ul {
     display: flex;
     margin: 0;
+
     li {
       position: relative;
       width: 100px;
@@ -187,6 +219,7 @@ export default {
       line-height: 30px;
       overflow: hidden;
       cursor: pointer;
+
       &::before {
         content: "";
         display: block;
@@ -197,9 +230,11 @@ export default {
         top: 6px;
         background-color: @border-color-base;
       }
+
       &:first-child::before {
         display: none;
       }
+
       span {
         display: block;
         font-size: 13px;
@@ -208,6 +243,7 @@ export default {
         white-space: nowrap;
         text-align: left;
         transition: color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
         &::after {
           content: "";
           position: absolute;
@@ -219,32 +255,39 @@ export default {
           background-color: #fff;
         }
       }
+
       &:hover {
         span {
           color: @primary-color;
         }
       }
+
       &.active {
         span {
           color: @primary-color;
         }
+
         &::before {
           display: none;
         }
+
         box-shadow: inset 0px 0px 8px @background-color;
         border-bottom: 2px solid @primary-color;
       }
+
       &.closable.active {
         .close-btn {
           opacity: 1;
         }
       }
+
       &.closable:hover {
         .close-btn {
           opacity: 1;
         }
       }
     }
+
     .close-btn {
       opacity: 0;
       font-size: 10px;
@@ -258,11 +301,62 @@ export default {
       border-radius: 50%;
       text-align: center;
       line-height: 14px;
+
       &:hover {
         background-color: #c0c4cc;
         color: #fff;
       }
     }
+  }
+}
+
+.contextmenu-container {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: #000000d9;
+  font-size: 14px;
+  font-variant: tabular-nums;
+  line-height: 1.5715;
+  list-style: none;
+  font-feature-settings: tnum;
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  z-index: 1050;
+  display: block;
+}
+
+.contextmenu-content {
+  position: relative;
+  margin: 0;
+  padding: 4px 0;
+  text-align: left;
+  list-style-type: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border-radius: 2px;
+  outline: none;
+  box-shadow: 0 2px 8px #00000026;
+
+  ul {
+    margin-bottom: 0;
+  }
+
+  li {
+    list-style: none;
+    font-size: 12px;
+  }
+}
+
+.contextmenu-menu-item {
+  line-height: 26px;
+  padding: 0 10px;
+  width: 80px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f5f5f5;
   }
 }
 </style>
