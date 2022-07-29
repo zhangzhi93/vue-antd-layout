@@ -1,8 +1,6 @@
 node_modules
-packages
-dist
-pages
 src
+public
 
 # 忽略指定文件
 App.vue

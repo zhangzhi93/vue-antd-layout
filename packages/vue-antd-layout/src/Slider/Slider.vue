@@ -1,111 +1,83 @@
 <template>
   <a-layout-sider
-    v-model="expand"
+    :collapsed="collapsed"
     :collapsible="collapsible"
     :theme="theme"
     :width="width"
     :trigger="trigger"
-    :collapsedWidth="collapsedWidth"
+    :collapsed-width="collapsedWidth"
+    :breakpoint="breakpoint"
     class="layout-slider"
+    @collapse="onCollapse"
+    @breakpoint="onBreakpoint"
   >
     <slot name="menuHeader">
-      <div
-        class="logo"
-        @click="onMenuHeaderClick"
-      >
-        <img
-          :src="logo"
-          :alt="title"
-        >
+      <div class="logo" @click="onMenuHeaderClick">
+        <img :src="logo" :alt="title">
         <transition name="collapse">
-          <h1 v-if="!collapsed">{{title}}</h1>
+          <h1 v-if="!collapsed">{{ title }}</h1>
         </transition>
       </div>
     </slot>
     <div class="slider-menu">
-      <slot name="asidePrefix"></slot>
+      <slot name="asidePrefix" />
       <a-menu
         mode="inline"
-        v-model="sliderSelectedKeys"
+        :selected-keys="selectedKeys"
+        :open-keys="openKeys"
         :theme="theme"
-        :inline-collapsed="collapsed"
-        :inlineIndent="inlineIndent"
-        :openKeys.sync="sliderOpenKeys"
+        :collapsed="collapsed"
+        :inline-indent="inlineIndent"
         @click="onMenuClick"
+        @open-change="onOpenChange"
+        @select="onMenuSelect"
       >
-        <template v-for="menu in data">
-          <sub-menu
-            v-if="menu.children && menu.children.length!==0"
-            :key="menu.name"
-            :menu-info="menu"
-          />
-          <menu-item
-            v-else
-            :key="menu.name"
-            :menu-info="menu"
-          />
+        <template v-for="menu in data" :key="menu.name">
+          <sub-menu v-if="menu.children && menu.children.length !== 0" :menu-info="menu" />
+          <menu-item v-else :menu-info="menu" />
         </template>
       </a-menu>
     </div>
-    <slot name="asideExtra"></slot>
+    <slot name="asideExtra" />
   </a-layout-sider>
 </template>
 
-<script>
+<script setup>
+import { defineProps, defineEmits, reactive } from 'vue';
 import SubMenu from './SubMenu.vue';
 import MenuItem from './MenuItem.vue';
 
-export default {
-  name: 'Slider',
-  props: ['data', 'theme', 'width', 'logo', 'title', 'trigger', 'collapsible', 'collapsed', 'collapsedWidth', 'inlineIndent', 'selectedKeys', 'openKeys'],
-  data() {
-    return {
-      expand: false,
-      sliderOpenKeys: [],
-      sliderSelectedKeys: [],
-    };
-  },
-  components: {
-    SubMenu,
-    MenuItem,
-  },
-  watch: {
-    collapsed: {
-      handler(val) {
-        this.expand = val;
-      },
-      immediate: true
-    },
-    expand(val) {
-      this.$emit('update:collapsed', val);
-    },
-    openKeys: {
-      handler(vals) {
-        this.sliderOpenKeys = vals;
-      },
-      immediate: true
-    },
-    sliderOpenKeys(vals) {
-      this.$emit('update:openKeys', vals);
-    },
-    selectedKeys: {
-      handler(vals) {
-        this.sliderSelectedKeys = vals;
-      },
-      immediate: true
-    },
-    sliderSelectedKeys(vals) {
-      this.$emit('update:selectedKeys', vals);
-    }
-  },
-  methods: {
-    onMenuHeaderClick() {
-      this.$emit('menuHeaderClick');
-    },
-    onMenuClick(data) {
-      this.$emit('menuClick', data);
-    }
-  },
+const emit = defineEmits(['collapse', 'menuOpenKeys', 'menuSelectedKeys', 'menuHeaderClick', 'menuClick', 'breakpoint']);
+
+// eslint-disable-next-line vue/require-prop-types
+const props = defineProps(['data', 'theme', 'width', 'logo', 'title', 'trigger', 'collapsible', 'collapsed', 'collapsedWidth', 'breakpoint', 'inlineIndent', 'selectedKeys', 'openKeys']);
+
+// watch
+
+
+// methods 
+
+const onCollapse = (collapsed, type) => {
+  emit('collapse', collapsed, type);
+};
+
+const onMenuHeaderClick = () => {
+  emit('menuHeaderClick');
+};
+const onMenuClick = (data) => {
+  emit('menuClick', data);
+};
+
+const onOpenChange = (openKeys) => {
+  emit('menuOpenKeys', openKeys);
+};
+
+const onMenuSelect = ({ selectedKeys }) => {
+  emit('menuSelectedKeys', selectedKeys);
+};
+
+const onBreakpoint = (broken) => {
+  emit('breakpoint', broken);
 };
 </script>
 
@@ -117,6 +89,7 @@ export default {
   box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35);
   height: 100vh;
   position: relative;
+
   .logo {
     box-sizing: border-box;
     position: relative;
@@ -130,11 +103,13 @@ export default {
     cursor: pointer;
     background-color: #409eff;
     box-shadow: 0 2px 6px rgb(0 21 41 / 35%);
+
     img {
       display: inline-block;
       height: 32px;
       vertical-align: middle;
     }
+
     h1 {
       display: inline-block;
       height: 32px;
@@ -147,28 +122,30 @@ export default {
     }
   }
 }
+
 .slider-menu {
   max-height: calc(~"100vh - 64px");
   overflow-y: auto;
   overflow-x: hidden;
-  /deep/.ant-menu-inline,
-  .ant-menu-vertical {
+
+  :deep(.ant-menu-inline,
+  .ant-menu-vertical){
     border-right: 1px solid #fff;
   }
-  .ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title,
-  .ant-menu-inline-collapsed > .ant-menu-item {
+
+  .ant-menu-inline-collapsed>.ant-menu-submenu>.ant-menu-submenu-title,
+  .ant-menu-inline-collapsed>.ant-menu-item {
     padding: 0 16px !important;
     text-align: center;
     font-size: 18px;
   }
+
   .ant-menu-inline-collapsed {
     width: 100%;
   }
-  .ant-menu-inline-collapsed
-    > .ant-menu-submenu
-    > .ant-menu-submenu-title
-    .anticon,
-  .ant-menu-inline-collapsed > .ant-menu-item .anticon {
+
+  .ant-menu-inline-collapsed>.ant-menu-submenu>.ant-menu-submenu-title .anticon,
+  .ant-menu-inline-collapsed>.ant-menu-item .anticon {
     font-size: 20px;
   }
 }
@@ -177,6 +154,7 @@ export default {
 .collapse-leave-active {
   transition: all cubic-bezier(0.55, 0, 0.1, 1) 0.15s;
 }
+
 .collapse-enter,
 .collapse-leave-to {
   transform: translateX(-40px);

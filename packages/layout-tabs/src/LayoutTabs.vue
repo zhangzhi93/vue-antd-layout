@@ -1,9 +1,6 @@
 <template>
   <div class="layout-tabs">
-    <div
-      class="flex-tabs"
-      v-if="type === 'flex'"
-    >
+    <div v-if="type === 'flex'" class="flex-tabs">
       <ul>
         <li
           v-for="item in tabsData"
@@ -13,18 +10,12 @@
           @contextmenu.prevent="(e) => onContextmenu(e, item)"
         >
           <span :title="item.title">{{ item.title }}</span>
-          <a-icon
-            type="close"
-            class="close-btn"
-            v-if="!item.permanent"
-            @click.stop="removeTab(item)"
-          />
+          <close-outlined v-if="!item.permanent" class="close-btn" @click.stop="removeTab(item)" />
         </li>
       </ul>
-      <slot
-        name="tabBarExtraContent"
-        slot="tabBarExtraContent"
-      ></slot>
+      <!-- <template #tabBarExtraContent>
+        <slot name="tabBarExtraContent" />
+      </template> -->
     </div>
     <a-tabs
       v-else
@@ -32,27 +23,48 @@
       type="editable-card"
       hideAdd
       size="small"
-      @tabClick="onTabClick"
-      @edit="onTabEdit"
-      @contextmenu.prevent.native="onTabContextmenu"
       :animated="animated"
       class="scroll-tabs"
+      @tab-click="onTabClick"
+      @edit="onTabEdit"
+      @contextmenu.prevent="onTabContextmenu"
     >
-      <a-tab-pane
-        v-for="item in tabsData"
-        :key="item.key"
-        :tab="item.title"
-        :closable="!item.permanent"
-      />
-      <slot
-        name="tabBarExtraContent"
-        slot="tabBarExtraContent"
-      ></slot>
+      <a-tab-pane v-for="item in tabsData" :key="item.key" :tab="item.title" :closable="!item.permanent" />
+      <template #tabBarExtraContent>
+        <slot name="tabBarExtraContent" />
+      </template>
     </a-tabs>
   </div>
 </template>
 
-<script>
+<script setup>
+import { defineProps, defineEmits, reactive } from 'vue';
+import { CloseOutlined } from '@ant-design/icons-vue';
+
+const emit = defineEmits(['tabClick', 'tabRemove', 'contextmenu']);
+
+const props = defineProps({
+  tabsData: {
+    type: Array,
+    default: () => []
+  },
+  activeName: {
+    type: String,
+    default: ''
+  },
+  type: {
+    type: String,
+    default: 'scroll',
+    validator: (value) => {
+      return ['scroll', 'flex'].indexOf(value) !== -1;
+    }
+  },
+  animated: {
+    type: Boolean,
+    default: false
+  },
+});
+
 // 查询当前节点的所有同级前面的节点
 function prevAll(elem) {
   const previousSiblings = [];
@@ -64,82 +76,43 @@ function prevAll(elem) {
   return previousSiblings;
 }
 
-export default {
-  name: 'LayoutTabs',
-  model: {
-    prop: 'activeName',
-    event: 'update'
-  },
-  props: {
-    tabsData: {
-      type: Array,
-      default: () => []
-    },
-    activeName: {
-      type: String,
-      default: ''
-    },
-    type: {
-      type: String,
-      default: 'scroll',
-      validator: (value) => {
-        return ['scroll', 'flex'].indexOf(value) !== -1
-      }
-    },
-    animated: {
-      type: Boolean,
-      default: false
-    },
-  },
-  data() {
-    return {
-      activeKey: ''
-    }
-  },
-  watch: {
-    activeName: {
-      handler(val) {
-        this.activeKey = val;
-      },
-      immediate: true
-    },
-    activeKey(val) {
-      this.$emit('update', val);
-    },
-  },
-  methods: {
-    onClick(data) {
-      this.$emit('tab-click', { ...data });
-    },
-    onTabClick(targetKey) {
-      const data = this.tabsData.find(item => item.key === targetKey) || {};
-      this.$emit('tab-click', { ...data });
-    },
-    removeTab(data) {
-      this.$emit('tab-remove', { ...data });
-    },
-    onTabEdit(targetKey, action) {
-      if (action === 'remove') {
-        const data = this.tabsData.find(item => item.key === targetKey) || {};
-        this.$emit('tab-remove', { ...data });
-      }
-    },
-    onTabContextmenu(e) {
-      let tabElem = null;
-      if (e.target.classList.contains('ant-tabs-tab')) {
-        tabElem = e.target;
-      } else {
-        tabElem = e.target.parentNode;
-      }
-      const index = prevAll(tabElem).length;
-      const data = this.tabsData[index];
-      this.$emit('contextmenu', e, { ...data });
-    },
-    onContextmenu(e, data) {
-      this.$emit('contextmenu', e, { ...data });
-    },
-  },
-}
+// methods
+
+const onClick = (data) => {
+  emit('tabClick', { ...data });
+};
+
+const onTabClick = (targetKey) => {
+  const data = this.tabsData.find(item => item.key === targetKey) || {};
+  emit('tabClick', { ...data });
+};
+
+const removeTab = (data) => {
+  emit('tabRemove', { ...data });
+};
+
+const onTabEdit = (targetKey, action) => {
+  if (action === 'remove') {
+    const data = this.tabsData.find(item => item.key === targetKey) || {};
+    emit('tabRemove', { ...data });
+  }
+};
+
+const onTabContextmenu = (e) => {
+  let tabElem = null;
+  if (e.target.classList.contains('ant-tabs-tab')) {
+    tabElem = e.target;
+  } else {
+    tabElem = e.target.parentNode;
+  }
+  const index = prevAll(tabElem).length;
+  const data = this.tabsData[index];
+  emit('contextmenu', e, { ...data });
+};
+
+const onContextmenu = (e, data) => {
+  emit('contextmenu', e, { ...data });
+};
 </script>
 
 <style lang="less" scoped>
@@ -154,7 +127,7 @@ export default {
 }
 
 .scroll-tabs {
-  /deep/.ant-tabs-bar.ant-tabs-card-bar {
+  :deep(.ant-tabs-bar.ant-tabs-card-bar) {
     margin-bottom: 0;
     border-bottom: 0;
 

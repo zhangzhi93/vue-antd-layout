@@ -1,31 +1,32 @@
-<template functional>
-  <a-sub-menu :key="props.menuInfo.name">
-    <template slot="title">
-      <a-icon :type="props.menuInfo.icon" v-if="props.menuInfo.icon" />
-      <span slot="title">{{props.menuInfo.title}}</span>
+<template>
+  <a-sub-menu :key="menuInfo.name">
+    <template #title>
+      <component :is="menuInfo.icon" v-if="menuInfo.icon" />
+      <span>{{ menuInfo.title }}</span>
     </template>
 
-    <template v-for="child in props.menuInfo.children">
-      <sub-menu v-if="child.children && child.children.length !== 0" :key="child.name"
-        :menu-info="child" />
-      <menu-item v-else :key="child.name" :menu-info="child" />
+    <template v-for="child in menuInfo.children" :key="child.name">
+      <sub-menu v-if="child.children && child.children.length !== 0" :menu-info="child" />
+      <menu-item v-else :menu-info="child" />
     </template>
   </a-sub-menu>
 </template>
 
-<script>
+<script setup>
+import { defineProps } from 'vue';
 import MenuItem from './MenuItem.vue';
 
-export default {
-  name: 'SubMenu',
-  props: {
-    menuInfo: {
-      type: Object,
-      required: true,
-    },
-  },
-  components: {
-    MenuItem,
+const props = defineProps({
+  menuInfo: {
+    type: Object,
+    required: true,
+    default: () => ({})
   }
+});
+</script>
+
+<script>
+export default {
+  name: 'SubMenu'
 };
 </script>
