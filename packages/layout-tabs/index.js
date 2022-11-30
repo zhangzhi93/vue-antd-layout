@@ -1,7 +1,7 @@
 import LayoutTabs from './src/LayoutTabs.vue';
 
 LayoutTabs.install = function (Vue) {
-  Vue.component(LayoutTabs.name, LayoutTabs);
+  Vue.component('LayoutTabs', LayoutTabs);
 };
 
 export default LayoutTabs;

@@ -13,7 +13,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
 import MenuItem from './MenuItem.vue';
 
 const props = defineProps({

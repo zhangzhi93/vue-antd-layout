@@ -4,12 +4,13 @@
     v-model:selected-keys="selectedKeys"
     v-model:open-keys="openKeys"
     :menu-data="data"
+    :trigger="null"
     @menu-header-click="goHome"
     @menu-click="onMenuClick"
   >
-    <!-- <template #navTabs>
+    <template #navTabs>
       <layout-tabs
-        v-model="active"
+        v-model:activeKey="activeTabKey"
         animated
         :tabs-data="tabs"
         type="scroll"
@@ -17,7 +18,7 @@
         @tab-remove="onTabRemove"
         @contextmenu="onContextmenu"
       />
-    </template> -->
+    </template>
     <template #asidePrefix>
       <p>dddd</p>
     </template>
@@ -97,7 +98,7 @@ export default {
       expand: false,
       selectedKeys: ['one'],
       openKeys: ['dashboard', 'status'],
-      active: '',
+      activeTabKey: 'a',
       tabs: [{
         title: 'Tab 1',
         key: 'a',
@@ -289,10 +290,11 @@ export default {
     },
     onTabClick(data) {
       console.log('click', data);
+      console.log(this.activeTabKey);
       // this.active = data.name;
     },
     onTabRemove(data) {
-      console.log(data);
+      console.log('remove', data);
     },
     onContextmenu(e, data) {
       console.log(e, data);

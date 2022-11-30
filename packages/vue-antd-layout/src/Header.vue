@@ -17,7 +17,7 @@
 
 
 <script setup>
-import { defineProps, defineEmits, computed, useSlots } from 'vue';
+import { computed, useSlots } from 'vue';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue';
 
 const emit = defineEmits(['collapse']);

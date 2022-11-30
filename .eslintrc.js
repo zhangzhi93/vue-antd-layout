@@ -28,7 +28,7 @@ module.exports = {
       objects: 'only-multiline',
       imports: 'only-multiline',
       exports: 'only-multiline',
-      functions: 'ignore'
+      functions: 'ignore' 
     }],
     'prefer-promise-reject-errors': 'off',
     'no-useless-escape': 'off',

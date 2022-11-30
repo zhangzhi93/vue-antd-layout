@@ -68,7 +68,6 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
 import Header from './Header.vue';
 import Slider from './Slider/Slider.vue';
 import setting from './setting';

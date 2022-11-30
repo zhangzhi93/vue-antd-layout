@@ -43,7 +43,6 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, reactive } from 'vue';
 import SubMenu from './SubMenu.vue';
 import MenuItem from './MenuItem.vue';
 
@@ -127,27 +126,6 @@ const onBreakpoint = (broken) => {
   max-height: calc(~"100vh - 64px");
   overflow-y: auto;
   overflow-x: hidden;
-
-  :deep(.ant-menu-inline,
-  .ant-menu-vertical){
-    border-right: 1px solid #fff;
-  }
-
-  .ant-menu-inline-collapsed>.ant-menu-submenu>.ant-menu-submenu-title,
-  .ant-menu-inline-collapsed>.ant-menu-item {
-    padding: 0 16px !important;
-    text-align: center;
-    font-size: 18px;
-  }
-
-  .ant-menu-inline-collapsed {
-    width: 100%;
-  }
-
-  .ant-menu-inline-collapsed>.ant-menu-submenu>.ant-menu-submenu-title .anticon,
-  .ant-menu-inline-collapsed>.ant-menu-item .anticon {
-    font-size: 20px;
-  }
 }
 
 .collapse-enter-active,

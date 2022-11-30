@@ -1,6 +1,7 @@
 <template>
   <div class="layout-tabs">
     <div v-if="type === 'flex'" class="flex-tabs">
+      <slot name="leftExtra" />
       <ul>
         <li
           v-for="item in tabsData"
@@ -9,17 +10,19 @@
           @click="onClick(item)"
           @contextmenu.prevent="(e) => onContextmenu(e, item)"
         >
-          <span :title="item.title">{{ item.title }}</span>
-          <close-outlined v-if="!item.permanent" class="close-btn" @click.stop="removeTab(item)" />
+          <span :title="item.title" class="tab-title" :class="!item.permanent ? 'tab-title-close-shadow' : ''">{{
+            item.title
+          }}</span>
+          <span v-if="!item.permanent" class="close-btn">
+            <close-outlined @click.stop="removeTab(item)" />
+          </span>
         </li>
       </ul>
-      <!-- <template #tabBarExtraContent>
-        <slot name="tabBarExtraContent" />
-      </template> -->
+      <slot name="rightExtra" />
     </div>
     <a-tabs
       v-else
-      v-model="activeKey"
+      :activeKey="activeKey"
       type="editable-card"
       hideAdd
       size="small"
@@ -29,26 +32,28 @@
       @edit="onTabEdit"
       @contextmenu.prevent="onTabContextmenu"
     >
+      <template #leftExtra>
+        <slot name="leftExtra" />
+      </template>
       <a-tab-pane v-for="item in tabsData" :key="item.key" :tab="item.title" :closable="!item.permanent" />
-      <template #tabBarExtraContent>
-        <slot name="tabBarExtraContent" />
+      <template #rightExtra>
+        <slot name="rightExtra" />
       </template>
     </a-tabs>
   </div>
 </template>
 
 <script setup>
-import { defineProps, defineEmits, reactive } from 'vue';
 import { CloseOutlined } from '@ant-design/icons-vue';
 
-const emit = defineEmits(['tabClick', 'tabRemove', 'contextmenu']);
+const emit = defineEmits(['tabClick', 'tabRemove', 'contextmenu', 'update:activeKey']);
 
 const props = defineProps({
   tabsData: {
     type: Array,
     default: () => []
   },
-  activeName: {
+  activeKey: {
     type: String,
     default: ''
   },
@@ -80,11 +85,13 @@ function prevAll(elem) {
 
 const onClick = (data) => {
   emit('tabClick', { ...data });
+  emit('update:activeKey', data.key);
 };
 
 const onTabClick = (targetKey) => {
-  const data = this.tabsData.find(item => item.key === targetKey) || {};
+  const data = props.tabsData.find(item => item.key === targetKey) || {};
   emit('tabClick', { ...data });
+  emit('update:activeKey', targetKey);
 };
 
 const removeTab = (data) => {
@@ -93,7 +100,7 @@ const removeTab = (data) => {
 
 const onTabEdit = (targetKey, action) => {
   if (action === 'remove') {
-    const data = this.tabsData.find(item => item.key === targetKey) || {};
+    const data = props.tabsData.find(item => item.key === targetKey) || {};
     emit('tabRemove', { ...data });
   }
 };
@@ -106,7 +113,7 @@ const onTabContextmenu = (e) => {
     tabElem = e.target.parentNode;
   }
   const index = prevAll(tabElem).length;
-  const data = this.tabsData[index];
+  const data = props.tabsData[index];
   emit('contextmenu', e, { ...data });
 };
 
@@ -127,47 +134,33 @@ const onContextmenu = (e, data) => {
 }
 
 .scroll-tabs {
-  :deep(.ant-tabs-bar.ant-tabs-card-bar) {
+  :deep(.ant-tabs-nav) {
     margin-bottom: 0;
-    border-bottom: 0;
 
-    .ant-tabs-nav-container {
-      height: 30px;
-    }
-
-    .ant-tabs-tab {
-      height: 30px;
-      line-height: 28px;
-      border: none;
-      border-right: 1px solid #e8e8e8;
-      font-size: 13px;
-      margin-right: 0;
-      border-radius: 0;
-
-      .anticon-close {
-        opacity: 0;
-        font-size: 10px;
-      }
+    .anticon-close {
+      opacity: 0;
+      font-size: 10px;
+      transition: all 0.15s cubic-bezier(0.645, 0.045, 0.355, 1);
     }
 
     .ant-tabs-tab-active {
-      border-bottom: none;
-      font-weight: normal;
-
       .anticon-close {
         opacity: 1;
       }
-
-      // &:after {
-      //   content: "";
-      //   display: block;
-      //   width: 100%;
-      //   border-bottom: 2px solid @primary-color;
-      // }
     }
 
-    .ant-tabs-ink-bar {
-      visibility: visible;
+    .ant-tabs-nav-wrap .ant-tabs-tab {
+      font-size: 13px;
+      padding-top: 0;
+      padding-bottom: 0;
+      height: 30px;
+      line-height: 30px;
+
+      &:hover {
+        .anticon-close {
+          opacity: 1;
+        }
+      }
     }
   }
 }
@@ -179,6 +172,7 @@ const onContextmenu = (e, data) => {
   ul {
     display: flex;
     margin: 0;
+    padding: 0;
 
     li {
       position: relative;
@@ -186,20 +180,19 @@ const onContextmenu = (e, data) => {
       list-style: none;
       flex: 0 1 100px;
       border-bottom: 1px solid @border-color-base;
-      // border-left: 1px solid @border-color;
       transition: color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
       height: 30px;
       line-height: 30px;
       overflow: hidden;
       cursor: pointer;
 
-      &::before {
+      &::after {
         content: "";
         display: block;
         position: absolute;
         height: 18px;
         width: 1px;
-        left: 0;
+        right: 0;
         top: 6px;
         background-color: @border-color-base;
       }
@@ -208,35 +201,37 @@ const onContextmenu = (e, data) => {
         display: none;
       }
 
-      span {
+      .tab-title {
         display: block;
         font-size: 13px;
         padding-left: 10px;
         overflow: hidden;
         white-space: nowrap;
         text-align: left;
-        transition: color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+        transition: color 0.15s cubic-bezier(0.645, 0.045, 0.355, 1);
 
-        &::after {
-          content: "";
-          position: absolute;
-          right: 0;
-          top: 0;
-          width: 22px;
-          height: 30px;
-          box-shadow: 0 0 6px 5px #fff;
-          background-color: #fff;
+        &.tab-title-close-shadow {
+          &::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 22px;
+            height: 30px;
+            box-shadow: 0 0 6px 5px #fff;
+            background-color: #fff;
+          }
         }
       }
 
       &:hover {
-        span {
+        .tab-title {
           color: @primary-color;
         }
       }
 
       &.active {
-        span {
+        .tab-title {
           color: @primary-color;
         }
 
@@ -264,7 +259,7 @@ const onContextmenu = (e, data) => {
     .close-btn {
       opacity: 0;
       font-size: 10px;
-      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+      transition: all 0.15s cubic-bezier(0.645, 0.045, 0.355, 1);
       width: 14px;
       height: 14px;
       position: absolute;
@@ -276,60 +271,10 @@ const onContextmenu = (e, data) => {
       line-height: 14px;
 
       &:hover {
-        background-color: #c0c4cc;
-        color: #fff;
+        background-color: #d0dcdc;
+        // color: #fff;
       }
     }
-  }
-}
-
-.contextmenu-container {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  color: #000000d9;
-  font-size: 14px;
-  font-variant: tabular-nums;
-  line-height: 1.5715;
-  list-style: none;
-  font-feature-settings: tnum;
-  position: fixed;
-  top: -9999px;
-  left: -9999px;
-  z-index: 1050;
-  display: block;
-}
-
-.contextmenu-content {
-  position: relative;
-  margin: 0;
-  padding: 4px 0;
-  text-align: left;
-  list-style-type: none;
-  background-color: #fff;
-  background-clip: padding-box;
-  border-radius: 2px;
-  outline: none;
-  box-shadow: 0 2px 8px #00000026;
-
-  ul {
-    margin-bottom: 0;
-  }
-
-  li {
-    list-style: none;
-    font-size: 12px;
-  }
-}
-
-.contextmenu-menu-item {
-  line-height: 26px;
-  padding: 0 10px;
-  width: 80px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #f5f5f5;
   }
 }
 </style>
