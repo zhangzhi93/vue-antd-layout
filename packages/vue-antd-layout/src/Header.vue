@@ -15,49 +15,48 @@
   </div>
 </template>
 
-
 <script setup>
-import { computed, useSlots } from 'vue';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue';
+import { computed, useSlots } from "vue";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons-vue";
 
-const emit = defineEmits(['collapse']);
+const emit = defineEmits(["collapse"]);
 
 const slots = useSlots();
 
 // eslint-disable-next-line vue/require-prop-types
-const props = defineProps(['collapsible', 'collapsed', 'height', 'theme']);
+const props = defineProps(["collapsible", "collapsed", "height", "theme"]);
 
 // computed
 const styleObject = computed(() => {
   const styleList = {
     height: props.height,
-    lineHeight: props.height
+    lineHeight: props.height,
   };
-  let background = '#fff';
+  let background = "#fff";
   let extraStyle = {};
-  if (props.theme === 'dark') {
-    background = '#000';
-  } else if (props.theme === 'light') {
-    background = '#fff';
+  if (props.theme === "dark") {
+    background = "#000";
+  } else if (props.theme === "light") {
+    background = "#fff";
   }
-  if (props.theme === 'light') {
+  if (props.theme === "light") {
     if (slots.navTabs) {
-      extraStyle = { borderBottom: '1px solid #efefef' };
+      extraStyle = { borderBottom: "1px solid #efefef" };
     } else {
-      extraStyle = { boxShadow: '0 1px 4px rgba(0, 21, 41, 0.08)' };
+      extraStyle = { boxShadow: "0 1px 4px rgba(0, 21, 41, 0.08)" };
     }
   }
   return {
     ...styleList,
     background,
-    ...extraStyle
+    ...extraStyle,
   };
 });
 
 // methods
 
 const onToggle = () => {
-  emit('collapse', !props.collapsed);
+  emit("collapse", !props.collapsed);
 };
 </script>
 

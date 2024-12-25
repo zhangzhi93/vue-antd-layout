@@ -6,13 +6,17 @@
         <li
           v-for="item in tabsData"
           :key="item.key"
-          :class="{ 'active': activeKey == item.key, 'closable': !item.closable }"
+          :class="{ active: activeKey == item.key, closable: !item.closable }"
           @click="onClick(item)"
           @contextmenu.prevent="(e) => onContextmenu(e, item)"
         >
-          <span :title="item.title" class="tab-title" :class="!item.permanent ? 'tab-title-close-shadow' : ''">{{
-            item.title
-          }}</span>
+          <span
+            :title="item.title"
+            class="tab-title"
+            :class="!item.permanent ? 'tab-title-close-shadow' : ''"
+          >
+            {{ item.title }}
+          </span>
           <span v-if="!item.permanent" class="close-btn">
             <close-outlined @click.stop="removeTab(item)" />
           </span>
@@ -22,9 +26,9 @@
     </div>
     <a-tabs
       v-else
-      :activeKey="activeKey"
+      :active-key="activeKey"
       type="editable-card"
-      hideAdd
+      hide-add
       size="small"
       :animated="animated"
       class="scroll-tabs"
@@ -35,7 +39,12 @@
       <template #leftExtra>
         <slot name="leftExtra" />
       </template>
-      <a-tab-pane v-for="item in tabsData" :key="item.key" :tab="item.title" :closable="!item.permanent" />
+      <a-tab-pane
+        v-for="item in tabsData"
+        :key="item.key"
+        :tab="item.title"
+        :closable="!item.permanent"
+      />
       <template #rightExtra>
         <slot name="rightExtra" />
       </template>
@@ -44,29 +53,34 @@
 </template>
 
 <script setup>
-import { CloseOutlined } from '@ant-design/icons-vue';
+import { CloseOutlined } from "@ant-design/icons-vue";
 
-const emit = defineEmits(['tabClick', 'tabRemove', 'contextmenu', 'update:activeKey']);
+const emit = defineEmits([
+  "tabClick",
+  "tabRemove",
+  "contextmenu",
+  "update:activeKey",
+]);
 
 const props = defineProps({
   tabsData: {
     type: Array,
-    default: () => []
+    default: () => [],
   },
   activeKey: {
     type: String,
-    default: ''
+    default: "",
   },
   type: {
     type: String,
-    default: 'scroll',
+    default: "scroll",
     validator: (value) => {
-      return ['scroll', 'flex'].indexOf(value) !== -1;
-    }
+      return ["scroll", "flex"].indexOf(value) !== -1;
+    },
   },
   animated: {
     type: Boolean,
-    default: false
+    default: false,
   },
 });
 
@@ -84,41 +98,41 @@ function prevAll(elem) {
 // methods
 
 const onClick = (data) => {
-  emit('tabClick', { ...data });
-  emit('update:activeKey', data.key);
+  emit("tabClick", { ...data });
+  emit("update:activeKey", data.key);
 };
 
 const onTabClick = (targetKey) => {
-  const data = props.tabsData.find(item => item.key === targetKey) || {};
-  emit('tabClick', { ...data });
-  emit('update:activeKey', targetKey);
+  const data = props.tabsData.find((item) => item.key === targetKey) || {};
+  emit("tabClick", { ...data });
+  emit("update:activeKey", targetKey);
 };
 
 const removeTab = (data) => {
-  emit('tabRemove', { ...data });
+  emit("tabRemove", { ...data });
 };
 
 const onTabEdit = (targetKey, action) => {
-  if (action === 'remove') {
-    const data = props.tabsData.find(item => item.key === targetKey) || {};
-    emit('tabRemove', { ...data });
+  if (action === "remove") {
+    const data = props.tabsData.find((item) => item.key === targetKey) || {};
+    emit("tabRemove", { ...data });
   }
 };
 
 const onTabContextmenu = (e) => {
   let tabElem = null;
-  if (e.target.classList.contains('ant-tabs-tab')) {
+  if (e.target.classList.contains("ant-tabs-tab")) {
     tabElem = e.target;
   } else {
     tabElem = e.target.parentNode;
   }
   const index = prevAll(tabElem).length;
   const data = props.tabsData[index];
-  emit('contextmenu', e, { ...data });
+  emit("contextmenu", e, { ...data });
 };
 
 const onContextmenu = (e, data) => {
-  emit('contextmenu', e, { ...data });
+  emit("contextmenu", e, { ...data });
 };
 </script>
 
@@ -134,8 +148,13 @@ const onContextmenu = (e, data) => {
 }
 
 .scroll-tabs {
+  padding-top: 2px;
   :deep(.ant-tabs-nav) {
     margin-bottom: 0;
+
+    &::before {
+      display: none;
+    }
 
     .anticon-close {
       opacity: 0;
@@ -150,11 +169,12 @@ const onContextmenu = (e, data) => {
     }
 
     .ant-tabs-nav-wrap .ant-tabs-tab {
-      font-size: 13px;
+      font-size: 12px;
       padding-top: 0;
       padding-bottom: 0;
-      height: 30px;
-      line-height: 30px;
+      height: 28px;
+      line-height: 28px;
+      border-bottom: none;
 
       &:hover {
         .anticon-close {

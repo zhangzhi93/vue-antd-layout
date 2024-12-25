@@ -13,9 +13,11 @@
   >
     <slot name="menuHeader">
       <div class="logo" @click="onMenuHeaderClick">
-        <img :src="logo" :alt="title">
+        <img :src="logo" :alt="title" />
         <transition name="collapse">
-          <h1 v-if="!collapsed">{{ title }}</h1>
+          <h1 v-if="!collapsed">
+            {{ title }}
+          </h1>
         </transition>
       </div>
     </slot>
@@ -32,10 +34,18 @@
         @open-change="onOpenChange"
         @select="onMenuSelect"
       >
-        <template v-for="menu in data" :key="menu.name">
-          <sub-menu v-if="menu.children && menu.children.length !== 0" :menu-info="menu" />
-          <menu-item v-else :menu-info="menu" />
-        </template>
+        <slider-item
+          v-for="item in data"
+          :key="item.name"
+          :data="item"
+        />
+        <!-- <template v-for="menu in data" :key="menu.name">
+          <sub-menu
+            v-if="menu.children && menu.children.length !== 0"
+            :data="menu"
+          />
+          <menu-item v-else :data="menu" />
+        </template> -->
       </a-menu>
     </div>
     <slot name="asideExtra" />
@@ -43,40 +53,59 @@
 </template>
 
 <script setup>
-import SubMenu from './SubMenu.vue';
-import MenuItem from './MenuItem.vue';
+import SliderItem from "./SliderItem.vue";
 
-const emit = defineEmits(['collapse', 'menuOpenKeys', 'menuSelectedKeys', 'menuHeaderClick', 'menuClick', 'breakpoint']);
+const emit = defineEmits([
+  "collapse",
+  "menuOpenKeys",
+  "menuSelectedKeys",
+  "menuHeaderClick",
+  "menuClick",
+  "breakpoint",
+]);
 
 // eslint-disable-next-line vue/require-prop-types
-const props = defineProps(['data', 'theme', 'width', 'logo', 'title', 'trigger', 'collapsible', 'collapsed', 'collapsedWidth', 'breakpoint', 'inlineIndent', 'selectedKeys', 'openKeys']);
+const props = defineProps([
+  "data",
+  "theme",
+  "width",
+  "logo",
+  "title",
+  "trigger",
+  "collapsible",
+  "collapsed",
+  "collapsedWidth",
+  "breakpoint",
+  "inlineIndent",
+  "selectedKeys",
+  "openKeys",
+]);
 
 // watch
 
-
-// methods 
+// methods
 
 const onCollapse = (collapsed, type) => {
-  emit('collapse', collapsed, type);
+  emit("collapse", collapsed, type);
 };
 
 const onMenuHeaderClick = () => {
-  emit('menuHeaderClick');
+  emit("menuHeaderClick");
 };
 const onMenuClick = (data) => {
-  emit('menuClick', data);
+  emit("menuClick", data);
 };
 
 const onOpenChange = (openKeys) => {
-  emit('menuOpenKeys', openKeys);
+  emit("menuOpenKeys", openKeys);
 };
 
 const onMenuSelect = ({ selectedKeys }) => {
-  emit('menuSelectedKeys', selectedKeys);
+  emit("menuSelectedKeys", selectedKeys);
 };
 
 const onBreakpoint = (broken) => {
-  emit('breakpoint', broken);
+  emit("breakpoint", broken);
 };
 </script>
 
@@ -95,7 +124,7 @@ const onBreakpoint = (broken) => {
     display: flex;
     align-items: center;
     padding: 16px;
-    max-width: 208px;
+    width: 100%;
     z-index: 1;
     text-align: center;
     line-height: 32px;

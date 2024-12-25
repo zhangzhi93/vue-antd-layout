@@ -2,20 +2,19 @@
   <a-layout>
     <Slider
       :collapsed="collapsed"
-      :selectedKeys="selectedKeys"
-      :openKeys="openKeys"
+      :selected-keys="selectedKeys"
+      :open-keys="openKeys"
       :data="menuData"
       :theme="theme"
       :logo="logo"
       :title="title"
       :width="siderWidth"
-      :collapsedWidth="collapsedWidth"
+      :collapsed-width="collapsedWidth"
       :breakpoint="breakpoint"
-      :inlineIndent="inlineIndent"
+      :inline-indent="inlineIndent"
       :collapsible="collapsible"
-      :defaultCollapsed="defaultCollapsed"
+      :default-collapsed="defaultCollapsed"
       :trigger="trigger"
-      :reverseArrow="reverseArrow"
       @collapse="onCollapse"
       @menu-click="onMenuClick"
       @menu-header-click="onMenuHeaderClick"
@@ -59,7 +58,9 @@
         <div v-if="showFooter" class="footer">
           <slot name="footer">
             <p>Vue-Antd-Layout</p>
-            <a href="https://github.com/zhangzhi93" target="_blank">https://github.com/zhangzhi93</a>
+            <a href="https://github.com/zhangzhi93" target="_blank">
+              https://github.com/zhangzhi93
+            </a>
           </slot>
         </div>
       </a-layout-content>
@@ -68,11 +69,18 @@
 </template>
 
 <script setup>
-import Header from './Header.vue';
-import Slider from './Slider/Slider.vue';
-import setting from './setting';
+import Header from "./Header.vue";
+import Slider from "./Slider/Slider.vue";
+import setting from "./setting";
 
-const emit = defineEmits(['update:collapsed', 'update:menuOpenKeys', 'update:menuSelectedKeys', 'menuHeaderClick', 'menuClick', 'breakpoint']);
+const emit = defineEmits([
+  "update:collapsed",
+  "update:menuOpenKeys",
+  "update:menuSelectedKeys",
+  "menuHeaderClick",
+  "menuClick",
+  "breakpoint",
+]);
 
 const props = defineProps({
   collapsed: {
@@ -82,6 +90,12 @@ const props = defineProps({
   menuData: {
     type: Array,
     default: () => [],
+  },
+  selectedKeys: {
+    type: Array,
+  },
+  openKeys: {
+    type: Array,
   },
   theme: {
     type: String,
@@ -124,46 +138,38 @@ const props = defineProps({
   },
   trigger: {
     type: String,
-  },
-  reverseArrow: {
-    type: Boolean
-  },
-  selectedKeys: {
-    type: Array
-  },
-  openKeys: {
-    type: Array
+    default: "",
   },
   showFooter: {
     type: Boolean,
     default: setting.showFooter,
-  }
+  },
 });
 
 // methods
 
 const onCollapse = (collapsed, type) => {
-  emit('update:collapsed', collapsed, type);
+  emit("update:collapsed", collapsed, type);
 };
 
 const onMenuSelectedKeys = (selectedKeys) => {
-  emit('update:menuSelectedKeys', selectedKeys);
+  emit("update:menuSelectedKeys", selectedKeys);
 };
 
 const onMenuOpenKeys = (openKeys) => {
-  emit('update:menuOpenKeys', openKeys);
+  emit("update:menuOpenKeys", openKeys);
 };
 
 const onMenuHeaderClick = () => {
-  emit('menuHeaderClick');
+  emit("menuHeaderClick");
 };
 
 const onMenuClick = (data) => {
-  emit('menuClick', data);
+  emit("menuClick", data);
 };
 
 const onBreakpoint = (broken) => {
-  emit('breakpoint', broken);
+  emit("breakpoint", broken);
 };
 </script>
 

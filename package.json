@@ -1,6 +1,6 @@
 {
   "name": "vue-antd-layout",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "基于antd快速搭建中台前端的layout",
   "files": [
     "dist"
@@ -15,7 +15,7 @@
   },
   "scripts": {
     "start": "vite",
-    "dev": "vite",
+    "dev": "vite --force",
     "build": "vite build",
     "serve": "vite preview"
   },
@@ -36,19 +36,19 @@
   },
   "homepage": "https://github.com/zhangzhi93/vue-antd-layout#readme",
   "devDependencies": {
-    "@ant-design/icons-vue": "^6.1.0",
-    "@babel/core": "^7.18.9",
-    "@babel/eslint-parser": "^7.18.9",
-    "@vitejs/plugin-vue": "^3.0.1",
-    "ant-design-vue": "^3.2.10",
-    "eslint": "^8.20.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-promise": "^6.0.0",
-    "eslint-plugin-vue": "^9.3.0",
-    "less": "^4.1.3",
-    "less-loader": "^11.0.0",
-    "vite": "^3.0.3",
-    "vite-plugin-libcss": "^1.0.5",
-    "vue": "^3.2.37"
+    "@ant-design/icons-vue": "^7.0.1",
+    "@babel/core": "^7.24.4",
+    "@babel/eslint-parser": "^7.24.1",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "ant-design-vue": "^4.2.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-vue": "^9.25.0",
+    "less": "^4.2.0",
+    "less-loader": "^12.2.0",
+    "vite": "^5.2.10",
+    "vite-plugin-libcss": "^1.1.1",
+    "vue": "^3.4.25"
   }
 }
